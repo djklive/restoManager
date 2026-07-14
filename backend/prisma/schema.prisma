@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id               String   @id @default(uuid())
+  nom              String
+  adresse          String?
+  logoUrl          String?
+  statutAbonnement String   @default("actif")
+  createdAt        DateTime @default(now())
+
+  users User[]
+}
+
+model User {
+  id             String      @id @default(uuid())
+  nom            String
+  email          String      @unique
+  motDePasseHash String
+  role           Role
+  restaurantId   String?
+  restaurant     Restaurant? @relation(fields: [restaurantId], references: [id])
+  actif          Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+enum Role {
+  ADMIN
+  GERANT
+  SERVEUR
+  CAISSIER
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
