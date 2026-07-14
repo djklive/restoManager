@@ -10,12 +10,16 @@ datasource db {
 model Restaurant {
   id               String   @id @default(uuid())
   nom              String
+  slug             String   @unique
   adresse          String?
   logoUrl          String?
   statutAbonnement String   @default("actif")
   createdAt        DateTime @default(now())
 
-  users User[]
+  users          User[]
+  menuCategories MenuCategory[]
+  dishes         Dish[]
+  tables         Table[]
 }
 
 model User {
@@ -45,4 +49,38 @@ model PasswordResetToken {
   expiresAt DateTime
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+model MenuCategory {
+  id           String     @id @default(uuid())
+  nom          String
+  ordre        Int        @default(0)
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  dishes       Dish[]
+  createdAt    DateTime   @default(now())
+}
+
+model Dish {
+  id           String       @id @default(uuid())
+  nom          String
+  description  String?
+  prix         Decimal      @db.Decimal(10, 2)
+  imageUrl     String?
+  disponible   Boolean      @default(true)
+  categorieId  String
+  categorie    MenuCategory @relation(fields: [categorieId], references: [id])
+  restaurantId String
+  restaurant   Restaurant   @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Table {
+  id           String     @id @default(uuid())
+  numero       String
+  qrCodeUrl    String?
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime   @default(now())
 }

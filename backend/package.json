@@ -16,13 +16,18 @@
   "dependencies": {
     "@emailjs/nodejs": "^5.0.2",
     "@prisma/client": "^6.19.0",
+    "@supabase/supabase-js": "^2.110.3",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "multer": "^2.2.0",
     "prisma": "^6.19.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.3",
+    "slugify": "^1.6.9",
     "zod": "^4.0.5"
   },
   "devDependencies": {

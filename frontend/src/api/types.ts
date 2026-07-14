@@ -12,6 +12,7 @@ export interface AuthUser {
 export interface Restaurant {
   id: string;
   nom: string;
+  slug: string;
   adresse: string | null;
   logoUrl: string | null;
   statutAbonnement: string;

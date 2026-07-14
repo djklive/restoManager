@@ -5,6 +5,7 @@ import { prisma } from "../../config/db.js";
 import { signJwt } from "../../config/jwt.js";
 import { sendPasswordResetEmail } from "../../config/email.js";
 import { AppError } from "../../utils/AppError.js";
+import { generateUniqueSlug } from "../../utils/slug.js";
 
 const SALT_ROUNDS = 10;
 const RESET_TOKEN_EXPIRY_MS = 60 * 60 * 1000;
@@ -48,9 +49,17 @@ export const registerRestaurant = async ({
 
   try {
     const { restaurant, user } = await prisma.$transaction(async (tx) => {
+      const slug = await generateUniqueSlug(nomRestaurant, async (candidate) => {
+        const found = await tx.restaurant.findUnique({
+          where: { slug: candidate },
+        });
+        return Boolean(found);
+      });
+
       const restaurant = await tx.restaurant.create({
         data: {
           nom: nomRestaurant,
+          slug,
           adresse: adresse ?? null,
         },
       });
@@ -75,10 +84,16 @@ export const registerRestaurant = async ({
     };
   } catch (error) {
     if (error.code === "P2002") {
+      const target = error.meta?.target;
+      const isEmail =
+        Array.isArray(target) && target.includes("email");
+
       throw new AppError(
         409,
-        "EMAIL_ALREADY_EXISTS",
-        "Cet email est déjà utilisé"
+        isEmail ? "EMAIL_ALREADY_EXISTS" : "SLUG_ALREADY_EXISTS",
+        isEmail
+          ? "Cet email est déjà utilisé"
+          : "Un restaurant avec un nom similaire existe déjà"
       );
     }
     throw error;
